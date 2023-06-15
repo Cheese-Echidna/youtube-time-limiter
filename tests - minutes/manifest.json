@@ -1,0 +1,19 @@
+{
+
+    "manifest_version": 2,
+    "name": "YtbTimeLimiter",
+    "version": "1.0",
+  
+    "description": "Limits daily time spent on YouTube website",
+    "permissions": [
+      "storage"
+    ],
+    "content_scripts": [
+      {
+        "matches": ["*://*.youtube.com/*"],
+        "js": ["main.js"]
+      }
+    ]
+  
+  }
+  
