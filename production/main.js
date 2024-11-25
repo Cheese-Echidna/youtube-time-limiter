@@ -1,15 +1,22 @@
 // Set interval to count time spent every second
-setInterval(countTimeSpentMinutes, 1000);
+const timeoutTime = 1000;
+setInterval(countTimeSpentMinutes, timeoutTime);
+
+// URL to redirect the user to when they exceed their daily limit
+const redirectUrl = "about:blank";
 
 // Check if a video is playing on the page
 function isPlaying() {
     const videoElement = document.querySelector('video');
-    return !videoElement.paused && !videoElement.ended;
+    return videoElement && !videoElement.paused && !videoElement.ended;
 }
 
 async function countTimeSpentMinutes() {
+    let timeSpentSeconds = getLocalStorageItem("ytb_time_spent", 0);
+    updateCountdownTimer(timeSpentSeconds);
     if (!isPlaying()) {
-        log("Video is not playing")
+        log(`Video is NOT playing
+Total time: ${formatSeconds(timeSpentSeconds)}`);
         return;
     }
 
@@ -23,24 +30,21 @@ async function countTimeSpentMinutes() {
         setLocalStorageItem("ytb_time_spent", 0);
     }
 
+
     // Update the last session day
     setLocalStorageItem("ytb_last_session_day", currentDay);
 
-    // Get current time spent and update it
-    let timeSpentSeconds = getLocalStorageItem("ytb_time_spent", 0);
-    timeSpentSeconds += 10; // Add 10 seconds
+    timeSpentSeconds += timeoutTime / 1000;
+
     setLocalStorageItem("ytb_time_spent", timeSpentSeconds);
 
-    log(`Time spent today: ${timeSpentSeconds} seconds`);
-
-    // Log every full minute
-    if (timeSpentSeconds % 60 === 0) {
-        console.log(`Full minute reached: ${timeSpentSeconds / 60} minutes spent today`);
-    }
+    log(`Video is playing
+Total time: ${formatSeconds(timeSpentSeconds)}`);
 
     // Check if the daily limit of 1 hour is reached
     if (timeSpentSeconds >= 3600) {
         alert("Daily YouTube time limit of 1 hour reached!");
+        window.location.href = redirectUrl;
     }
 }
 
@@ -65,5 +69,21 @@ function setLocalStorageItem(key, value) {
 }
 
 function log(message) {
-    console.warn(`[YT-Limiter]\n${message}`)
+    console.log(`[YT-Limiter]\n${message}`);
+}
+
+function formatSeconds(time) {
+    let seconds = time % 60;
+    let minutes = Math.floor(time / 60);
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+// Function to update the countdown timer and replace YouTube logo
+function updateCountdownTimer(secondsElapsed) {
+    let time = 60*60 - secondsElapsed;
+    const logoElement = document.querySelector('#logo-icon');
+    if (!logoElement) return;
+
+    logoElement.textContent = formatSeconds(time)
+
 }
