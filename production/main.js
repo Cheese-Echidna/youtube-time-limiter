@@ -1,8 +1,9 @@
 // Set interval to count time spent every second
 const timeoutTime = 1000;
-setInterval(countTimeSpentMinutes, timeoutTime);
+const maxSeconds = 60*60;
 
-// URL to redirect the user to when they exceed their daily limit
+setInterval(countTime, timeoutTime);
+
 const redirectUrl = "about:blank";
 
 // Check if a video is playing on the page
@@ -11,14 +12,9 @@ function isPlaying() {
     return videoElement && !videoElement.paused && !videoElement.ended;
 }
 
-async function countTimeSpentMinutes() {
+async function countTime() {
     let timeSpentSeconds = getLocalStorageItem("ytb_time_spent", 0);
     updateCountdownTimer(timeSpentSeconds);
-    if (!isPlaying()) {
-        log(`Video is NOT playing
-Total time: ${formatSeconds(timeSpentSeconds)}`);
-        return;
-    }
 
     const today = new Date();
     const currentDay = today.getDate();
@@ -28,18 +24,20 @@ Total time: ${formatSeconds(timeSpentSeconds)}`);
     if (currentDay !== lastSessionDay) {
         // If it's a new day, reset time spent
         setLocalStorageItem("ytb_time_spent", 0);
+        // Update the last session day
+        setLocalStorageItem("ytb_last_session_day", currentDay);
     }
 
-
-    // Update the last session day
-    setLocalStorageItem("ytb_last_session_day", currentDay);
+    if (!isPlaying()) {
+        log(`Video is NOT playing\nTotal time: ${formatSeconds(timeSpentSeconds)}`);
+        return;
+    }
 
     timeSpentSeconds += timeoutTime / 1000;
 
     setLocalStorageItem("ytb_time_spent", timeSpentSeconds);
 
-    log(`Video is playing
-Total time: ${formatSeconds(timeSpentSeconds)}`);
+    log(`Video is playing\nTotal time: ${formatSeconds(timeSpentSeconds)}`);
 
     // Check if the daily limit of 1 hour is reached
     if (timeSpentSeconds >= 3600) {
@@ -80,7 +78,7 @@ function formatSeconds(time) {
 
 // Function to update the countdown timer and replace YouTube logo
 function updateCountdownTimer(secondsElapsed) {
-    let time = 60*60 - secondsElapsed;
+    let time = maxSeconds - Math.min(secondsElapsed, maxSeconds);
     const logoElement = document.querySelector('#logo-icon');
     if (!logoElement) return;
 
