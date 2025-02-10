@@ -1,15 +1,32 @@
 {
   "manifest_version": 2,
-  "name": "YouTube Daily Time Limiter",
-  "version": "1.0",
+  "name": "YT Time Limiter",
+  "version": "2.0",
   "description": "Limits daily time spent on YouTube website",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{8188ed5c-fab3-4f55-a64b-9bf5089f41c5}"
+    }
+  },
+  "icons": {
+    "512": "icon.png"
+  },
+  "browser_action": {
+    "default_popup": "popup/index.html",
+    "default_title": "YT Time Limiter"
+  },
   "permissions": [
     "storage"
   ],
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["main.js"]
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "lib.js",
+        "tracking/main.js"
+      ]
     }
   ]
 }

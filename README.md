@@ -1,9 +1,14 @@
 # YouTube time limiter
-Firefox add-on, that limits daily time spent on YouTube website, by throwing an alert when more than one hour has been spent.
+This version was modified from the original to make it a bit easier to work with.
 
-Install add-on here : [https://addons.mozilla.org/fr/firefox/addon/youtube-daily-time-limiter/](https://addons.mozilla.org/fr/firefox/addon/youtube-daily-time-limiter/)
+Forked from [this](https://github.com/RonanDesh/yt-time-limiter) repo.
 
-## Repository structure
+Build to zip (dev mode) with `web-ext build`
 
-* Production folder contains code version which will be published on addon.mozilla.org
-* Tests folders contain code version modified to perform accelerated tests (avoid waiting one day to test the reset feature, and avoid waiting one minute for each step)
+Build to zip (production mode) with 
+
+`$keys = Get-Content ..\keys.txt | ConvertFrom-Json`
+
+and then
+
+`web-ext sign --api-key $keys.apiKey --api-secret $keys.apiSecret --channel unlisted`
