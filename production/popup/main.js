@@ -1,19 +1,15 @@
 document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("extra").addEventListener("click", async () => {
-        let timeSpent = await getTimeSpent();
-        if (timeSpent <= 0) {
-            return
-        }
         await incrementTimeSpent(-20*60)
         await incrementButtonPresses();
         await update();
     });
     document.getElementById("return").addEventListener("click", async () => {
         let timeRemaining = await getTimeRemaining();
-        if (timeRemaining < 30*60) {
+        if (timeRemaining < 25*60) {
             return
         }
-        await incrementTimeSpent(30*60)
+        await incrementTimeSpent(25*60)
         await decrementButtonPresses();
         await update();
     });
@@ -21,8 +17,37 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 async function update() {
+    await update_dev();
     await updateTimeSpent();
     await updateButtonCount();
+}
+
+async function update_dev() {
+    if (DEBUG) {
+        let dev = document.getElementById("dev")
+        let timeSpent = await getTimeSpent();
+        dev.innerHTML = `
+            <h2>Debug Mode</h2>
+            <p>Time spent: ${timeSpent}s - ${formatSeconds(timeSpent)}</p>
+            <button id="1">Reset time spent</button>
+            <p>Last session day: ${await getItem(LAST_SESSION_DAY_KEY, -1)}</p>
+            <button id="2">Reset last session day</button>
+            <p>Button presses: ${await getButtonPresses()}</p>
+            <button id="3">Reset button presses</button>
+           `
+        document.getElementById("1").addEventListener("click", async () => {
+            await setItem(TIME_SPENT_KEY, 0);
+            await update();
+        });
+        document.getElementById("2").addEventListener("click", async () => {
+            await setItem(LAST_SESSION_DAY_KEY, -1);
+            await update();
+        });
+        document.getElementById("3").addEventListener("click", async () => {
+            await setItem(BUTTON, 0);
+            await update();
+        });
+    }
 }
 
 async function updateButtonCount() {
@@ -36,6 +61,8 @@ async function updateTimeSpent() {
     if (time <= 0) {
         document.getElementById("output").textContent = "Time is up!";
         document.body.style.backgroundColor = "#ff6060";
+    } else {
+        document.body.style.backgroundColor = "#ffffff";
     }
 }
 

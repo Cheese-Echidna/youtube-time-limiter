@@ -34,8 +34,11 @@ async function getTimeSpent() {
 
     if (currentDay !== lastSessionDay) {
         log(`New day: ${currentDay}; Old day: ${lastSessionDay}`);
+
+        let presses = 60 * await getButtonPresses();
         // If it's a new day, reset time spent
-        await setItem(TIME_SPENT_KEY, 0);
+        await setItem(TIME_SPENT_KEY, presses);
+        log(`Reset time spent to ${presses} seconds`);
         // Update the last session day
         await setItem(LAST_SESSION_DAY_KEY, currentDay);
     }
@@ -81,10 +84,13 @@ async function updateCountdownTimer() {
     const logoElement = document.getElementById("logo");
     if (!logoElement) return;
 
-    logoElement.textContent = formatSeconds(time)
-    // Format text as BOLD, LARGE, and RED
+    logoElement.onclick = function() {
+        window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank");
+    }
+
+    logoElement.innerHTML = `<a href="/"> ${formatSeconds(time)} </a>`
     logoElement.style.fontWeight = "bold";
-    logoElement.style.fontSize = "x-large";
+    logoElement.style.fontSize = "xxx-large";
     logoElement.style.color = "red";
 }
 
@@ -96,3 +102,4 @@ const TIME_SPENT_KEY = "yttl_time_spent";
 const LAST_SESSION_DAY_KEY = "yttl_last_session_day";
 const BUTTON = "yttl_extra_button";
 const MAX_SECONDS = 60*60;
+const DEBUG = false;
