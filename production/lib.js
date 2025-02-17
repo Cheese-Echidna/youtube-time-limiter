@@ -84,14 +84,10 @@ async function updateCountdownTimer() {
     const logoElement = document.getElementById("logo");
     if (!logoElement) return;
 
-    logoElement.onclick = function() {
-        window.open("https://www.youtube.com/watch?v=dQw4w9WgXcQ", "_blank");
-    }
-
     logoElement.innerHTML = `<a href="/"> ${formatSeconds(time)} </a>`
     logoElement.style.fontWeight = "bold";
     logoElement.style.fontSize = "xxx-large";
-    logoElement.style.color = "red";
+    // logoElement.style.color = "red";
 }
 
 async function dailyLimitReached() {

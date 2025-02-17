@@ -7,8 +7,8 @@ Build to zip (dev mode) with `web-ext build`
 
 Build to zip (production mode) with 
 
-`$keys = Get-Content ..\keys.txt | ConvertFrom-Json`
+$keys = Get-Content ..\keys.txt | ConvertFrom-Json
 
 and then
 
-`web-ext sign --api-key $keys.apiKey --api-secret $keys.apiSecret --channel unlisted`
+web-ext sign --api-key $keys.apiKey --api-secret $keys.apiSecret --channel unlisted
