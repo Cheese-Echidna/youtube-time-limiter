@@ -28,13 +28,9 @@ async function setItem(key, value) {
     }
 }
 
-let timeSpent;
 
 async function getTimeSpent() {
-    if (timeSpent === undefined) {
-        timeSpent = await getItem(TIME_SPENT_KEY, 0);
-    }
-    return timeSpent;
+    return await getItem(TIME_SPENT_KEY, 0);
 }
 
 async function swapDay() {
@@ -61,13 +57,11 @@ async function getTimeRemaining() {
 }
 
 async function resetTimeSpent() {
-    timeSpent = 0;
     await setItem(TIME_SPENT_KEY, 0);
 }
 
 async function incrementTimeSpent(seconds) {
     let new_time = await getTimeSpent() + seconds
-    timeSpent = new_time;
     await setItem(TIME_SPENT_KEY, new_time);
 }
 
@@ -115,4 +109,3 @@ const LAST_SESSION_DAY_KEY = "yttl_last_session_day";
 const BUTTON = "yttl_extra_button";
 const MAX_SECONDS = 60*60;
 const DEBUG = false;
-timeSpent = undefined;

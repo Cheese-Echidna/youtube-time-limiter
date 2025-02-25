@@ -18,6 +18,8 @@ function stopPlaying() {
 async function countTime() {
     if (!isPlaying()) {
         return;
+    } else {
+        await swapDay();
     }
 
     let timeSpentSeconds = await getTimeSpent();
@@ -34,7 +36,6 @@ async function countTime() {
 }
 
 async function main() {
-    await swapDay();
     await countTime();
     await updateCountdownTimer();
 }

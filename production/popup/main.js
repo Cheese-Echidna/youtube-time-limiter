@@ -27,10 +27,10 @@ async function update() {
 async function updateDev() {
     if (DEBUG) {
         let dev = document.getElementById("dev")
-        let timeSpent = await getTimeSpent();
+        let timeSpentS = await getTimeSpent();
         dev.innerHTML = `
             <h2>Debug Mode</h2>
-            <p>Time spent: ${timeSpent}s - ${formatSeconds(timeSpent)}</p>
+            <p>Time spent: ${timeSpentS}s - ${formatSeconds(timeSpentS)}</p>
             <button id="1">Reset time spent</button>
             <p>Last session day: ${await getItem(LAST_SESSION_DAY_KEY, -1)}</p>
             <button id="2">Reset last session day</button>
