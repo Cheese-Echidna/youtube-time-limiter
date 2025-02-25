@@ -29,6 +29,10 @@ async function setItem(key, value) {
 }
 
 async function getTimeSpent() {
+    return await getItem(TIME_SPENT_KEY, 0);
+}
+
+async function getTimeSpentAndSwapDay() {
     const currentDay = new Date().getDate();
     let lastSessionDay = await getItem(LAST_SESSION_DAY_KEY, -1);
 

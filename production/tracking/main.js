@@ -16,11 +16,11 @@ function stopPlaying() {
 }
 
 async function countTime() {
-    let timeSpentSeconds = await getTimeSpent();
-
     if (!isPlaying()) {
         return;
     }
+
+    let timeSpentSeconds = await getTimeSpentAndSwapDay();
 
     await incrementTimeSpent(timeoutTime / 1000);
 
