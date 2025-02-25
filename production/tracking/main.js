@@ -20,7 +20,7 @@ async function countTime() {
         return;
     }
 
-    let timeSpentSeconds = await getTimeSpentAndSwapDay();
+    let timeSpentSeconds = await getTimeSpent();
 
     await incrementTimeSpent(timeoutTime / 1000);
 
@@ -34,6 +34,7 @@ async function countTime() {
 }
 
 async function main() {
+    await swapDay();
     await countTime();
     await updateCountdownTimer();
 }

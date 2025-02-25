@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("extra").addEventListener("click", async () => {
         await incrementTimeSpent(-20*60)
         await incrementButtonPresses();
-        await update();
     });
     document.getElementById("return").addEventListener("click", async () => {
         let timeRemaining = await getTimeRemaining();
@@ -11,18 +10,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         await incrementTimeSpent(25*60)
         await decrementButtonPresses();
-        await update();
     });
     await update();
 });
 
+const timeoutTime = 1000;
+
+setInterval(update, timeoutTime);
+
 async function update() {
-    await update_dev();
     await updateTimeSpent();
+    await updateDev();
     await updateButtonCount();
 }
 
-async function update_dev() {
+async function updateDev() {
     if (DEBUG) {
         let dev = document.getElementById("dev")
         let timeSpent = await getTimeSpent();
@@ -36,11 +38,12 @@ async function update_dev() {
             <button id="3">Reset button presses</button>
            `
         document.getElementById("1").addEventListener("click", async () => {
-            await setItem(TIME_SPENT_KEY, 0);
+            await resetTimeSpent();
             await update();
         });
         document.getElementById("2").addEventListener("click", async () => {
             await setItem(LAST_SESSION_DAY_KEY, -1);
+            await swapDay();
             await update();
         });
         document.getElementById("3").addEventListener("click", async () => {
