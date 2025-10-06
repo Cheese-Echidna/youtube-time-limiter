@@ -1,5 +1,16 @@
 {
+  "name": "yt-time-limiter",
+  "version": "2.6.0",
+  "private": true,
   "devDependencies": {
-    "webextension-polyfill": "^0.12.0"
+    "webextension-polyfill": "^0.12.0",
+    "eslint": "^9.11.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "prettier": "^3.3.3"
+  },
+  "scripts": {
+    "lint": "eslint \"production/**/*.js\" --max-warnings=0",
+    "format": "prettier --write \"**/*.{js,json,css,html,md}\""
   }
 }

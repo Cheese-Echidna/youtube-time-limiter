@@ -1,19 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>YT Time Limiter</title>
     <script src="../lib.js"></script>
     <script src="main.js"></script>
-</head>
-<body>
-<h1>YT Time Limiter</h1>
-<h3 id="output">Time remaining: ???</h3>
-<button id="extra">Take 20 minutes that don't belong to you</button>
-<br>
-<br>
-<button id="return">Return 25 minutes to the sands of time</button>
-<p id="button-count">??? presses</p>
-<div id="dev"></div>
-</body>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 12px;
+        width: 320px;
+      }
+      .row {
+        margin: 6px 0;
+      }
+      label {
+        display: inline-block;
+        width: 140px;
+      }
+      input[type='number'] {
+        width: 70px;
+      }
+      canvas {
+        width: 100%;
+        height: 120px;
+        border: 1px solid #ccc;
+      }
+      .muted {
+        color: #666;
+        font-size: 12px;
+      }
+      #status {
+        font-weight: bold;
+      }
+      #actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>YT Time Limiter</h1>
+    <h3 id="output">Time remaining: ???</h3>
+    <div class="row">
+      <label for="daily-minutes">Daily limit (min)</label>
+      <input id="daily-minutes" type="number" min="1" step="1" />
+    </div>
+    <div class="row">
+      <label for="reset-time">Reset time</label>
+      <input id="reset-time" type="time" />
+    </div>
+    <div id="actions">
+      <button id="save-settings">Save settings</button>
+      <button id="export-csv">Export CSV</button>
+    </div>
+    <p class="muted">Graph: last 14 days</p>
+    <canvas id="history-chart" width="300" height="120"></canvas>
+    <div id="dev"></div>
+  </body>
 </html>
