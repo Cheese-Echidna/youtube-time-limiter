@@ -25,9 +25,9 @@ async function countTime() {
   await addToHistory(timeoutTime / 1000);
 
   if (await dailyLimitReached()) {
-    log('Daily YouTube time limit reached!');
+    log('Weekly YouTube time limit reached!');
     stopPlaying();
-    alert('Daily YouTube time limit reached!');
+    alert('Weekly YouTube time limit reached!');
   } else {
     const timeSpentSeconds = await getTimeSpent();
     log(`Video is playing - Total time: ${formatSeconds(timeSpentSeconds)}`);

@@ -1,10 +1,10 @@
 # YouTube Time Limiter
 
-This WebExtension limits how much time you spend on YouTube per day. It now includes:
+This WebExtension limits how much time you spend on YouTube with a fixed weekly cap. It now includes:
 
-- Configurable daily limit (minutes)
-- Configurable daily reset time (HH:MM local time)
-- Automatic tracking of watch time per day
+- Fixed weekly limit: 7 hours per week
+- Weekly reset at Monday 00:00 (local time)
+- Automatic tracking of watch time per calendar day (for history/graph)
 - 14-day usage graph in the popup
 - Export full history as CSV
 - ESLint + Prettier for consistent code style
@@ -12,14 +12,13 @@ This WebExtension limits how much time you spend on YouTube per day. It now incl
 ## Usage
 
 - Click the extension icon to open the popup.
-- Set your Daily limit (minutes) and Reset time; click Save settings.
-- The remaining time is shown at the top. When time runs out, currently playing video will be paused.
+- The remaining time for the current week is shown at the top. When time runs out, the currently playing video will be paused.
 - View the last 14 days of usage in the embedded graph.
 - Click Export CSV to download your full watch history.
 
 Notes:
 
-- The reset boundary uses the configured Reset time. A "day" is considered from Reset time to the next day's Reset time.
+- The time limit and reset schedule are fixed in the code (7 hours/week, reset Monday 00:00) and are not configurable from the popup.
 
 ## Development
 

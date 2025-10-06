@@ -36,23 +36,25 @@ async function setItem(key, value) {
 }
 
 // Settings helpers
+// Weekly limit: fixed 7 hours (420 minutes)
 async function getDailyLimitMinutes() {
-  return await getItem(DAILY_LIMIT_MIN_KEY, 60);
+  // Keep function name for backward compatibility; now returns weekly minutes (7h = 420min)
+  return 420;
 }
 async function setDailyLimitMinutes(m) {
-  await setItem(DAILY_LIMIT_MIN_KEY, Math.max(1, Math.floor(m)));
+  // No-op: limit is fixed in code now
 }
 async function getDailyLimitSeconds() {
+  // Weekly limit in seconds
   return (await getDailyLimitMinutes()) * 60;
 }
 
+// Reset time settings are deprecated; kept for backward compatibility with storage structure
 async function getResetTimeString() {
-  // Format HH:MM (24h)
-  const s = await getRawItem(RESET_TIME_KEY, '00:00');
-  return typeof s === 'string' && /^\d{2}:\d{2}$/.test(s) ? s : '00:00';
+  return '00:00';
 }
 async function setResetTimeString(v) {
-  await setItem(RESET_TIME_KEY, v);
+  // No-op in fixed-schedule mode
 }
 
 function parseResetOffsetMinutes(str) {
@@ -61,9 +63,19 @@ function parseResetOffsetMinutes(str) {
 }
 
 function getShiftedDateKey(date, resetMinutes) {
-  // Shift date backwards by resetMinutes to align day boundary
+  // Shift date backwards by resetMinutes to align day boundary (used for per-day history)
   const d = new Date(date.getTime() - resetMinutes * 60 * 1000);
   return d.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+function getWeekKey(date) {
+  // Returns YYYY-MM-DD for the Monday of the current week (local time)
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay(); // 0=Sun,1=Mon,...
+  const diffFromMonday = (day + 6) % 7; // 0 when Monday
+  d.setDate(d.getDate() - diffFromMonday);
+  return d.toISOString().slice(0, 10);
 }
 
 async function getHistory() {
@@ -73,8 +85,8 @@ async function setHistory(h) {
   await setItem(HISTORY_KEY, h);
 }
 async function addToHistory(seconds) {
-  const resetMinutes = parseResetOffsetMinutes(await getResetTimeString());
-  const key = getShiftedDateKey(new Date(), resetMinutes);
+  // Keep daily history (aligned to midnight) for charting purposes
+  const key = getShiftedDateKey(new Date(), 0);
   const history = await getHistory();
   history[key] = (history[key] || 0) + seconds;
   await setHistory(history);
@@ -97,16 +109,14 @@ async function getTimeSpent() {
 }
 
 async function ensureResetBoundary() {
-  // Reset if we crossed the configured daily boundary
-  const resetStr = await getResetTimeString();
-  const resetMinutes = parseResetOffsetMinutes(resetStr);
+  // Reset if we crossed the weekly boundary (Monday 00:00 local time)
   const now = new Date();
   const lastKey = await getRawItem(LAST_RESET_DAY_KEY, null);
-  const currentKey = getShiftedDateKey(now, resetMinutes);
+  const currentKey = getWeekKey(now);
   if (lastKey !== currentKey) {
     await setItem(LAST_RESET_DAY_KEY, currentKey);
     await resetTimeSpent();
-    // ensure we start counting the new day fresh
+    // start the new week fresh
   }
 }
 
@@ -126,9 +136,10 @@ async function incrementTimeSpent(seconds) {
 
 function formatSeconds(time) {
   const bounded = Math.max(0, Math.floor(time));
-  let seconds = bounded % 60;
-  let minutes = Math.floor(bounded / 60);
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  const hours = Math.floor(bounded / 3600);
+  const minutes = Math.floor((bounded % 3600) / 60);
+  const seconds = bounded % 60;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 function log(message) {

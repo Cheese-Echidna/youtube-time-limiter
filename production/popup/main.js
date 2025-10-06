@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  await initSettingsUI();
+  await initUI();
   await update();
 });
 
@@ -14,34 +14,23 @@ async function update() {
   await updateDev();
 }
 
-async function initSettingsUI() {
-  // Load settings
-  const minutes = await getDailyLimitMinutes();
-  const resetTime = await getResetTimeString();
-  document.getElementById('daily-minutes').value = String(minutes);
-  document.getElementById('reset-time').value = resetTime;
-
-  document.getElementById('save-settings').addEventListener('click', async () => {
-    const m = Number(document.getElementById('daily-minutes').value) || 60;
-    const rt = document.getElementById('reset-time').value || '00:00';
-    await setDailyLimitMinutes(m);
-    await setResetTimeString(rt);
-    await ensureResetBoundary();
-    await update();
-  });
-
-  document.getElementById('export-csv').addEventListener('click', async () => {
-    const csv = await buildHistoryCsv();
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'yt-time-limiter-history.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  });
+async function initUI() {
+  // Only export CSV is available in the popup now
+  const exportBtn = document.getElementById('export-csv');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', async () => {
+      const csv = await buildHistoryCsv();
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'yt-time-limiter-history.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
 }
 
 async function drawHistoryChart() {
@@ -50,7 +39,7 @@ async function drawHistoryChart() {
   const history = await getHistory();
   const days = lastNDates(14);
   const values = days.map((d) => history[d] || 0);
-  const maxVal = Math.max(...values, await getDailyLimitSeconds());
+  const maxVal = Math.max(...values, 1); // scale to observed max
 
   // Clear
   ctx.clearRect(0, 0, canvas.width, canvas.height);
