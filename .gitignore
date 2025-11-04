@@ -1,3 +1,5 @@
 .idea
 keys.txt
 node_modules
+builds/
+.env

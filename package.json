@@ -1,17 +1,24 @@
 {
     "name": "yt-time-limiter",
-    "version": "2.6.0",
+    "version": "2.6.1",
     "private": true,
     "devDependencies": {
+        "@eslint/eslintrc": "^3.3.1",
+        "@eslint/js": "^9.39.1",
+        "dotenv-cli": "^11.0.0",
         "eslint": "^9.11.1",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-prettier": "^5.2.1",
+        "globals": "^16.5.0",
         "prettier": "^3.3.3",
         "typescript": "^5.9.3",
         "vite": "^7.1.9",
+        "web-ext": "^8.0.0",
         "webextension-polyfill": "^0.12.0"
     },
     "scripts": {
+        "dev": "web-ext run --source-dir=src",
+        "build": "dotenv -- web-ext sign --source-dir=src --artifacts-dir=builds --channel=unlisted",
         "lint": "eslint \"src/**/*.js\" --max-warnings=0",
         "format": "prettier --write \"**/*.{js,json,css,html,md}\""
     }

@@ -1,100 +1,100 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>YT Time Limiter</title>
-    <script src="../lib.js"></script>
-    <script src="main.js"></script>
-    <style>
-      body {
-        font-family: sans-serif;
-        padding: 12px;
-        width: 320px;
-      }
-      .row {
-        margin: 6px 0;
-      }
-      label {
-        display: inline-block;
-        width: 140px;
-      }
-      input[type='number'] {
-        width: 70px;
-      }
-      canvas {
-        width: 100%;
-        height: 120px;
-        border: 1px solid #ccc;
-      }
-      .muted {
-        color: #666;
-        font-size: 12px;
-      }
-      #status {
-        font-weight: bold;
-      }
-      #actions {
-        margin-top: 10px;
-        display: flex;
-        gap: 8px;
-      }
-      #discard-section {
-        margin-top: 15px;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        background-color: #f9f9f9;
-      }
-      #discard-section h4 {
-        margin: 0 0 10px 0;
-        font-size: 14px;
-      }
-      #discard-slider-container {
-        margin: 10px 0;
-      }
-      #discard-slider {
-        width: 100%;
-      }
-      #discard-amount {
-        text-align: center;
-        margin: 8px 0;
-        font-weight: bold;
-      }
-      #discard-btn {
-        width: 100%;
-        padding: 8px;
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: bold;
-      }
-      #discard-btn:hover {
-        background-color: #c82333;
-      }
-      #discard-btn:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>YT Time Limiter</h1>
-    <h3 id="output">Time remaining: ???</h3>
-    <div id="actions">
-      <button id="export-csv">Export CSV</button>
-    </div>
-    <div id="discard-section">
-      <h4>Discard Time</h4>
-      <div id="discard-slider-container">
-        <input type="range" id="discard-slider" min="0" max="7" step="0.1" value="0">
-        <div id="discard-amount">0.0 hours</div>
-      </div>
-      <button id="discard-btn">Discard</button>
-    </div>
-    <p class="muted">Graph: last 14 days</p>
-    <canvas id="history-chart" width="300" height="120"></canvas>
-    <div id="dev"></div>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <title>YT Time Limiter</title>
+        <script src="../lib.js"></script>
+        <script src="main.js"></script>
+        <style>
+            body {
+                font-family: sans-serif;
+                padding: 12px;
+                width: 320px;
+            }
+            .row {
+                margin: 6px 0;
+            }
+            label {
+                display: inline-block;
+                width: 140px;
+            }
+            input[type="number"] {
+                width: 70px;
+            }
+            canvas {
+                width: 100%;
+                height: 120px;
+                border: 1px solid #ccc;
+            }
+            .muted {
+                color: #666;
+                font-size: 12px;
+            }
+            #status {
+                font-weight: bold;
+            }
+            #actions {
+                margin-top: 10px;
+                display: flex;
+                gap: 8px;
+            }
+            #discard-section {
+                margin-top: 15px;
+                padding: 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                background-color: #f9f9f9;
+            }
+            #discard-section h4 {
+                margin: 0 0 10px 0;
+                font-size: 14px;
+            }
+            #discard-slider-container {
+                margin: 10px 0;
+            }
+            #discard-slider {
+                width: 100%;
+            }
+            #discard-amount {
+                text-align: center;
+                margin: 8px 0;
+                font-weight: bold;
+            }
+            #discard-btn {
+                width: 100%;
+                padding: 8px;
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            #discard-btn:hover {
+                background-color: #c82333;
+            }
+            #discard-btn:disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>YT Time Limiter</h1>
+        <h3 id="output">Time remaining: ???</h3>
+        <div id="actions">
+            <button id="export-csv">Export CSV</button>
+        </div>
+        <div id="discard-section">
+            <h4>Discard Time</h4>
+            <div id="discard-slider-container">
+                <input type="range" id="discard-slider" min="0" max="7" step="0.1" value="0" />
+                <div id="discard-amount">0.0 hours</div>
+            </div>
+            <button id="discard-btn">Discard</button>
+        </div>
+        <p class="muted">Graph: last 14 days</p>
+        <canvas id="history-chart" width="300" height="120"></canvas>
+        <div id="dev"></div>
+    </body>
 </html>
