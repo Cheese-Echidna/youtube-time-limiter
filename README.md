@@ -9,6 +9,10 @@ This WebExtension limits how much time you spend on YouTube with a fixed weekly 
 - Export full history as CSV
 - ESLint + Prettier for consistent code style
 
+## Project structure
+
+- src: all extension source files (manifest.json, lib.js, popup/, tracking/)
+
 ## Usage
 
 - Click the extension icon to open the popup.
@@ -28,6 +32,12 @@ Install dependencies:
 npm install
 ```
 
+Build to production/:
+
+```
+npm run build
+```
+
 Lint and format:
 
 ```
@@ -36,14 +46,6 @@ npm run format
 ```
 
 ### Build/sign with web-ext
-
-Dev build (zip):
-
-```
-web-ext build
-```
-
-Production sign (PowerShell):
 
 ```
 cd production

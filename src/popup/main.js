@@ -10,6 +10,7 @@ setInterval(update, timeoutTime);
 async function update() {
   await ensureResetBoundary();
   await updateTimeSpent();
+  await updateDiscardSliderMax();
   await drawHistoryChart();
   await updateDev();
 }
@@ -30,6 +31,78 @@ async function initUI() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
+  }
+
+  // Initialize discard time functionality
+  await initDiscardTime();
+}
+
+async function initDiscardTime() {
+  const slider = document.getElementById('discard-slider');
+  const amountDisplay = document.getElementById('discard-amount');
+  const discardBtn = document.getElementById('discard-btn');
+
+  if (!slider || !amountDisplay || !discardBtn) return;
+
+  // Update slider max based on available time and weekly limit
+  await updateDiscardSliderMax();
+
+  // Update displayed amount when slider changes
+  slider.addEventListener('input', async () => {
+    const hours = parseFloat(slider.value);
+    amountDisplay.textContent = `${hours.toFixed(1)} hours`;
+    
+    // Check if we can discard this amount
+    const timeRemaining = await getTimeRemaining();
+    const timeRemainingHours = timeRemaining / 3600;
+    discardBtn.disabled = hours <= 0 || hours > timeRemainingHours;
+  });
+
+  // Handle discard button click
+  discardBtn.addEventListener('click', async () => {
+    const hours = parseFloat(slider.value);
+    if (hours <= 0) return;
+
+    // Double-check we're not discarding more than available
+    const timeRemaining = await getTimeRemaining();
+    const timeRemainingHours = timeRemaining / 3600;
+    if (hours > timeRemainingHours) {
+      alert(`Cannot discard ${hours.toFixed(1)} hours. Only ${timeRemainingHours.toFixed(1)} hours remaining.`);
+      return;
+    }
+
+    const secondsToDiscard = Math.round(hours * 3600);
+    await incrementTimeSpent(secondsToDiscard);
+    
+    // Reset slider and update display
+    slider.value = 0;
+    amountDisplay.textContent = '0.0 hours';
+    discardBtn.disabled = true;
+
+    // Update the UI to reflect the change
+    await update();
+  });
+
+  // Initial state
+  discardBtn.disabled = true;
+}
+
+async function updateDiscardSliderMax() {
+  const slider = document.getElementById('discard-slider');
+  if (!slider) return;
+
+  const maxHours = await getDailyLimitMinutes() / 60; // Convert minutes to hours (7 hours)
+  slider.max = maxHours.toFixed(1);
+  
+  // Update button state based on available time
+  const timeRemaining = await getTimeRemaining();
+  const timeRemainingHours = timeRemaining / 3600;
+  const currentValue = parseFloat(slider.value);
+  const discardBtn = document.getElementById('discard-btn');
+  
+  if (discardBtn) {
+    // Disable if no time selected or if selected amount exceeds time remaining
+    discardBtn.disabled = currentValue <= 0 || currentValue > timeRemainingHours;
   }
 }
 

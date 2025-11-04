@@ -1,9 +1,26 @@
 /// <reference types="webextension-polyfill" />
 
+// Keys and constants
+const TIME_SPENT_KEY = 'yttl_time_spent';
+const LAST_RESET_DAY_KEY = 'yttl_last_reset_day'; // stores date key aligned to reset time
+const HISTORY_KEY = 'yttl_history';
+const DAILY_LIMIT_MIN_KEY = 'yttl_daily_limit_min';
+const RESET_TIME_KEY = 'yttl_reset_time'; // "HH:MM"
+const DEBUG = false;
+
+// Keys that should sync across devices
+const SYNC_KEYS = new Set([TIME_SPENT_KEY, LAST_RESET_DAY_KEY]);
+
+// Helper function to determine which storage area to use
+function getStorageArea(key) {
+  return SYNC_KEYS.has(key) ? browser.storage.sync : browser.storage.local;
+}
+
 // Helper function to get numeric item from storage with a default value
 async function getItem(key, defaultValue) {
   try {
-    const value = (await browser.storage.local.get({ [key]: defaultValue }))[key];
+    const storage = getStorageArea(key);
+    const value = (await storage.get({ [key]: defaultValue }))[key];
     if (value === undefined || value === null) {
       return defaultValue;
     }
@@ -17,7 +34,8 @@ async function getItem(key, defaultValue) {
 // Helper to get raw (non-numeric) values
 async function getRawItem(key, defaultValue) {
   try {
-    const value = (await browser.storage.local.get({ [key]: defaultValue }))[key];
+    const storage = getStorageArea(key);
+    const value = (await storage.get({ [key]: defaultValue }))[key];
     return value === undefined ? defaultValue : value;
   } catch (e) {
     console.error(`Error getting raw ${key}:`, e);
@@ -28,7 +46,8 @@ async function getRawItem(key, defaultValue) {
 // Helper function to set an item in storage
 async function setItem(key, value) {
   try {
-    await browser.storage.local.set({ [key]: value });
+    const storage = getStorageArea(key);
+    await storage.set({ [key]: value });
   } catch (error) {
     console.error(`Unexpected error setting ${key} in storage:`, error);
     return Promise.reject(error);
@@ -162,14 +181,6 @@ async function updateCountdownTimer() {
 async function dailyLimitReached() {
   return (await getTimeSpent()) >= (await getDailyLimitSeconds());
 }
-
-// Keys and constants
-const TIME_SPENT_KEY = 'yttl_time_spent';
-const LAST_RESET_DAY_KEY = 'yttl_last_reset_day'; // stores date key aligned to reset time
-const HISTORY_KEY = 'yttl_history';
-const DAILY_LIMIT_MIN_KEY = 'yttl_daily_limit_min';
-const RESET_TIME_KEY = 'yttl_reset_time'; // "HH:MM"
-const DEBUG = false;
 
 // For backward compatibility (old code may call swapDay/button funcs)
 async function swapDay() {
