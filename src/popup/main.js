@@ -35,6 +35,9 @@ async function initUI() {
 
     // Initialize discard time functionality
     await initDiscardTime();
+    
+    // Initialize midday restriction toggle
+    await initMiddayRestriction();
 }
 
 async function initDiscardTime() {
@@ -177,3 +180,17 @@ async function updateTimeSpent() {
 }
 
 setInterval(updateTimeSpent, 1000);
+
+async function initMiddayRestriction() {
+    const toggle = document.getElementById("midday-restriction-toggle");
+    if (!toggle) return;
+    
+    // Load current state
+    const enabled = await isMiddayRestrictionEnabled();
+    toggle.checked = enabled;
+    
+    // Update on change
+    toggle.addEventListener("change", async () => {
+        await setMiddayRestrictionEnabled(toggle.checked);
+    });
+}

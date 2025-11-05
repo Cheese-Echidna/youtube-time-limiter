@@ -6,6 +6,7 @@ const LAST_RESET_DAY_KEY = "yttl_last_reset_day"; // stores date key aligned to 
 const HISTORY_KEY = "yttl_history";
 const DAILY_LIMIT_MIN_KEY = "yttl_daily_limit_min";
 const RESET_TIME_KEY = "yttl_reset_time"; // "HH:MM"
+const MIDDAY_RESTRICTION_ENABLED_KEY = "yttl_midday_restriction_enabled";
 const DEBUG = false;
 
 // Keys that should sync across devices
@@ -195,4 +196,19 @@ async function incrementButtonPresses() {
 }
 async function decrementButtonPresses() {
     /* removed feature */
+}
+
+// Midday restriction functions
+async function isMiddayRestrictionEnabled() {
+    return await getRawItem(MIDDAY_RESTRICTION_ENABLED_KEY, true); // default to true
+}
+
+async function setMiddayRestrictionEnabled(enabled) {
+    await setItem(MIDDAY_RESTRICTION_ENABLED_KEY, enabled);
+}
+
+function isBeforeMidday() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    return currentHour < 12; // Before 12:00 PM (midday)
 }

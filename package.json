@@ -18,7 +18,7 @@
     },
     "scripts": {
         "dev": "web-ext run --source-dir=src",
-        "build": "dotenv -- web-ext sign --source-dir=src --artifacts-dir=builds --channel=unlisted",
+        "build": "dotenv -- web-ext sign --source-dir=src --artifacts-dir=builds --channel=listed",
         "lint": "eslint \"src/**/*.js\" --max-warnings=0",
         "format": "prettier --write \"**/*.{js,json,css,html,md}\""
     }
