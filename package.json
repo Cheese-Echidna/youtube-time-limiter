@@ -1,25 +1,30 @@
 {
     "name": "yt-time-limiter",
-    "version": "2.6.1",
+    "version": "2.8",
     "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "pnpm build:source && concurrently -k \"pnpm build:watch\" \"web-ext run --source-dir=.extension-build --artifacts-dir=build/web-ext-artifacts\"",
+        "build": "pnpm build:source && dotenv -- web-ext sign --source-dir=.extension-build --artifacts-dir=build/signed-builds --channel=listed --amo-metadata=amo.json",
+        "build_unlisted": "pnpm build:source && dotenv -- web-ext sign --source-dir=.extension-build --artifacts-dir=build/signed-builds --channel=unlisted --amo-metadata=amo.json",
+        "lint": "pnpm typecheck && eslint --config src/eslint.config.js \"src/**/*.ts\" --max-warnings=0",
+        "format": "prettier --write \"**/*.{ts,js,mjs,json,css,html,md}\"",
+        "typecheck": "tsc --noEmit --project src/tsconfig.json",
+        "build:source": "node scripts/build.mjs",
+        "build:watch": "node scripts/build.mjs --watch"
+    },
     "devDependencies": {
-        "@eslint/eslintrc": "^3.3.1",
         "@eslint/js": "^9.39.1",
+        "@types/firefox-webext-browser": "^120.0.4",
+        "concurrently": "^9.2.1",
         "dotenv-cli": "^11.0.0",
-        "eslint": "^9.11.1",
+        "esbuild": "^0.27.0",
+        "eslint": "^9.39.1",
         "eslint-config-prettier": "^9.1.0",
-        "eslint-plugin-prettier": "^5.2.1",
         "globals": "^16.5.0",
         "prettier": "^3.3.3",
         "typescript": "^5.9.3",
-        "vite": "^7.1.9",
-        "web-ext": "^8.0.0",
-        "webextension-polyfill": "^0.12.0"
-    },
-    "scripts": {
-        "dev": "web-ext run --source-dir=src",
-        "build": "dotenv -- web-ext sign --source-dir=src --artifacts-dir=builds --channel=listed",
-        "lint": "eslint \"src/**/*.js\" --max-warnings=0",
-        "format": "prettier --write \"**/*.{js,json,css,html,md}\""
+        "typescript-eslint": "^8.46.2",
+        "web-ext": "^8.0.0"
     }
 }

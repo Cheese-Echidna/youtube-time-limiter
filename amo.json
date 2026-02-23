@@ -1,11 +1,9 @@
 {
     "summary": {
-      "en-US": "Limits daily time spent on YouTube website"
+        "en-US": "Limits weekly time spent on YouTube website"
     },
-    "categories": [
-      "productivity"
-    ],
+    "categories": ["other"],
     "version": {
-      "license": "MIT"
+        "license": "MIT"
     }
 }

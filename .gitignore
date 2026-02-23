@@ -1,5 +1,10 @@
 .idea
 keys.txt
 node_modules
-builds/
 .env
+builds/
+.extension-build/
+build/web-ext-artifacts/*
+!build/web-ext-artifacts/.gitkeep
+build/signed-builds/*
+!build/signed-builds/.gitkeep
