@@ -55,7 +55,7 @@ async function updateCountdownTimer(): Promise<void> {
     const remainingSeconds = await getTimeRemainingSeconds();
     logoElement.innerHTML = `<a href="/">${formatSeconds(remainingSeconds)}</a>`;
     logoElement.style.fontWeight = "700";
-    logoElement.style.fontSize = "2rem";
+    logoElement.style.fontSize = "5rem";
 }
 
 async function enforcePlaybackRestrictions(videoElement: HTMLVideoElement): Promise<boolean> {

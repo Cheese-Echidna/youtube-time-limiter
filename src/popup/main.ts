@@ -13,6 +13,7 @@ import {
 
 type PopupElements = {
     output: HTMLElement;
+    statusText: HTMLElement;
     exportCsvButton: HTMLButtonElement;
     discardSlider: HTMLInputElement;
     discardAmount: HTMLElement;
@@ -36,6 +37,7 @@ function getRequiredElement<T extends HTMLElement>(id: string): T {
 function getPopupElements(): PopupElements {
     return {
         output: getRequiredElement<HTMLElement>("output"),
+        statusText: getRequiredElement<HTMLElement>("status-text"),
         exportCsvButton: getRequiredElement<HTMLButtonElement>("export-csv"),
         discardSlider: getRequiredElement<HTMLInputElement>("discard-slider"),
         discardAmount: getRequiredElement<HTMLElement>("discard-amount"),
@@ -66,9 +68,19 @@ async function updateDiscardControls(elements: PopupElements): Promise<void> {
     const selectedHours = Number.parseFloat(elements.discardSlider.value) || 0;
     const remainingSeconds = await getTimeRemainingSeconds();
     const remainingHours = remainingSeconds / 3600;
+    if (remainingHours <= 0 && selectedHours > 0) {
+        elements.discardSlider.value = "0";
+    }
 
-    elements.discardAmount.textContent = `${selectedHours.toFixed(1)} hours`;
-    elements.discardButton.disabled = selectedHours <= 0 || selectedHours > remainingHours;
+    const currentSelectedHours = Number.parseFloat(elements.discardSlider.value) || 0;
+    const maxHours = Number.parseFloat(elements.discardSlider.max) || WEEKLY_LIMIT_HOURS;
+    const sliderProgress = maxHours > 0 ? Math.min((currentSelectedHours / maxHours) * 100, 100) : 0;
+
+    elements.discardSlider.style.setProperty("--slider-progress", `${sliderProgress}%`);
+
+    elements.discardSlider.disabled = remainingHours <= 0;
+    elements.discardAmount.textContent = `${currentSelectedHours.toFixed(1)} hours selected`;
+    elements.discardButton.disabled = currentSelectedHours <= 0 || currentSelectedHours > remainingHours;
 }
 
 async function discardSelectedTime(elements: PopupElements): Promise<void> {
@@ -97,6 +109,10 @@ async function drawHistoryChart(elements: PopupElements): Promise<void> {
         return;
     }
 
+    const documentStyles = getComputedStyle(document.body);
+    const axisColor = documentStyles.getPropertyValue("--chart-axis").trim() || "#95a6bb";
+    const barColor = documentStyles.getPropertyValue("--chart-bar").trim() || "#0f766e";
+
     const history = await getHistory();
     const dateKeys = lastNDates(HISTORY_DAYS_VISIBLE);
     const values = dateKeys.map((dateKey) => history[dateKey] ?? 0);
@@ -110,13 +126,13 @@ async function drawHistoryChart(elements: PopupElements): Promise<void> {
 
     context.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    context.strokeStyle = "#6b7280";
+    context.strokeStyle = axisColor;
     context.beginPath();
     context.moveTo(padding, canvasHeight - padding);
     context.lineTo(canvasWidth - padding, canvasHeight - padding);
     context.stroke();
 
-    context.fillStyle = "#1d4ed8";
+    context.fillStyle = barColor;
     for (let index = 0; index < values.length; index += 1) {
         const value = values[index] ?? 0;
         const height = Math.round((value / maxValue) * chartHeight);
@@ -131,7 +147,8 @@ async function updateRemainingTime(elements: PopupElements): Promise<void> {
     const remainingSeconds = await getTimeRemainingSeconds();
     const depleted = remainingSeconds <= 0;
 
-    elements.output.textContent = depleted ? "Time is up!" : `Time remaining: ${formatSeconds(remainingSeconds)}`;
+    elements.output.textContent = depleted ? "00:00:00" : formatSeconds(remainingSeconds);
+    elements.statusText.textContent = depleted ? "Weekly limit reached" : "Time remaining this week";
 
     document.body.classList.toggle("is-depleted", depleted);
 }
