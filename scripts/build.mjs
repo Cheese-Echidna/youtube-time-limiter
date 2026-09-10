@@ -20,6 +20,7 @@ const staticFiles = [
 
 const sharedBuildOptions = {
     entryPoints: {
+        background: path.join(sourceDir, "background.ts"),
         content: path.join(sourceDir, "content.ts"),
         "popup/main": path.join(sourceDir, "popup", "main.ts"),
     },

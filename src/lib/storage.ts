@@ -1,6 +1,8 @@
 import { STORAGE_KEYS } from "./constants";
 
-const syncKeys: ReadonlySet<string> = new Set([STORAGE_KEYS.timeSpentSeconds, STORAGE_KEYS.lastResetWeekKey]);
+// The quota is intentionally one synced value so a read never combines fields from
+// different writes. Its updates are serialized by the background script.
+const syncKeys: ReadonlySet<string> = new Set([STORAGE_KEYS.quota]);
 
 function getStorageArea(key: string): browser.storage.StorageArea {
     return syncKeys.has(key) ? browser.storage.sync : browser.storage.local;

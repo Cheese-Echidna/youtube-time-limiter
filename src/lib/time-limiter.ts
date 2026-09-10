@@ -1,8 +1,18 @@
-import { MIDDAY_CUTOFF_HOUR, STORAGE_KEYS, WEEKLY_LIMIT_SECONDS } from "./constants";
-import { getWeekKey, toDateKey } from "./date";
+import {
+    ACCRUED_SECONDS_PER_MILLISECOND,
+    DAILY_ALLOWANCE_SECONDS,
+    MAX_BALANCE_SECONDS,
+    STORAGE_KEYS,
+} from "./constants";
+import { toDateKey } from "./date";
 import { getNumberFromStorage, getValueFromStorage, setValueInStorage } from "./storage";
 
 export type UsageHistory = Record<string, number>;
+
+export type Quota = {
+    availableSeconds: number;
+    updatedAt: number;
+};
 
 function sanitizeHistory(rawValue: unknown): UsageHistory {
     if (!rawValue || typeof rawValue !== "object" || Array.isArray(rawValue)) {
@@ -56,58 +66,72 @@ export async function buildHistoryCsv(): Promise<string> {
     return rows.join("\n");
 }
 
-export async function getTimeSpentSeconds(): Promise<number> {
-    return getNumberFromStorage(STORAGE_KEYS.timeSpentSeconds, 0);
-}
-
-export async function setTimeSpentSeconds(seconds: number): Promise<void> {
-    const normalizedSeconds = Math.max(0, Math.round(seconds));
-    await setValueInStorage(STORAGE_KEYS.timeSpentSeconds, normalizedSeconds);
-}
-
-export async function incrementTimeSpent(seconds: number): Promise<number> {
-    const normalizedSeconds = Math.max(0, Math.round(seconds));
-    if (normalizedSeconds === 0) {
-        return getTimeSpentSeconds();
+function sanitizeQuota(rawValue: unknown): Quota | null {
+    if (!rawValue || typeof rawValue !== "object" || Array.isArray(rawValue)) {
+        return null;
     }
 
-    const nextValue = (await getTimeSpentSeconds()) + normalizedSeconds;
-    await setTimeSpentSeconds(nextValue);
-    return nextValue;
-}
+    const rawQuota = rawValue as Record<string, unknown>;
+    const availableSeconds = Number(rawQuota.availableSeconds);
+    const updatedAt = Number(rawQuota.updatedAt);
 
-export async function ensureWeeklyBoundary(now: Date = new Date()): Promise<void> {
-    const currentWeekKey = getWeekKey(now);
-    const lastResetWeekKey = await getValueFromStorage<string | null>(STORAGE_KEYS.lastResetWeekKey, null);
-
-    if (lastResetWeekKey === currentWeekKey) {
-        return;
+    if (!Number.isFinite(availableSeconds) || !Number.isFinite(updatedAt) || updatedAt <= 0) {
+        return null;
     }
 
-    await setValueInStorage(STORAGE_KEYS.lastResetWeekKey, currentWeekKey);
-    await setTimeSpentSeconds(0);
+    return {
+        availableSeconds: Math.min(MAX_BALANCE_SECONDS, Math.max(0, availableSeconds)),
+        // Do not move a future timestamp backwards. This prevents a clock change
+        // on one synced device from creating extra allowance on another one.
+        updatedAt,
+    };
 }
 
-export async function getTimeRemainingSeconds(): Promise<number> {
-    const spentSeconds = await getTimeSpentSeconds();
-    const boundedSpentSeconds = Math.min(spentSeconds, WEEKLY_LIMIT_SECONDS);
-    return Math.max(0, WEEKLY_LIMIT_SECONDS - boundedSpentSeconds);
+function accrue(quota: Quota, now: number): Quota {
+    const elapsedMilliseconds = Math.max(0, now - quota.updatedAt);
+    return {
+        availableSeconds: Math.min(
+            MAX_BALANCE_SECONDS,
+            quota.availableSeconds + elapsedMilliseconds * ACCRUED_SECONDS_PER_MILLISECOND,
+        ),
+        updatedAt: Math.max(quota.updatedAt, now),
+    };
 }
 
-export async function hasReachedWeeklyLimit(): Promise<boolean> {
-    const spentSeconds = await getTimeSpentSeconds();
-    return spentSeconds >= WEEKLY_LIMIT_SECONDS;
+async function getStoredQuota(now: number): Promise<Quota> {
+    const rawQuota = await getValueFromStorage<unknown>(STORAGE_KEYS.quota, null);
+    const quota = sanitizeQuota(rawQuota);
+    if (quota) {
+        return quota;
+    }
+
+    // Preserve an existing install's current daily balance when upgrading from
+    // the midnight-reset model. New installs begin with one day's allowance.
+    const legacySpentSeconds = await getNumberFromStorage(STORAGE_KEYS.timeSpentSeconds, 0);
+    return {
+        availableSeconds: Math.max(0, DAILY_ALLOWANCE_SECONDS - legacySpentSeconds),
+        updatedAt: now,
+    };
 }
 
-export async function isMiddayRestrictionEnabled(): Promise<boolean> {
-    const value = await getValueFromStorage(STORAGE_KEYS.middayRestrictionEnabled, true);
-    return Boolean(value);
+export async function getQuota(now: Date = new Date()): Promise<Quota> {
+    const timestamp = now.getTime();
+    return accrue(await getStoredQuota(timestamp), timestamp);
 }
 
-export async function setMiddayRestrictionEnabled(enabled: boolean): Promise<void> {
-    await setValueInStorage(STORAGE_KEYS.middayRestrictionEnabled, enabled);
+export async function saveQuota(quota: Quota): Promise<void> {
+    await setValueInStorage(STORAGE_KEYS.quota, quota);
 }
 
-export function isBeforeMidday(now: Date = new Date()): boolean {
-    return now.getHours() < MIDDAY_CUTOFF_HOUR;
+export function consumeQuota(quota: Quota, seconds: number): Quota {
+    const requestedSeconds = Number(seconds);
+    const chargeSeconds = Number.isFinite(requestedSeconds) ? Math.max(0, requestedSeconds) : 0;
+    return {
+        ...quota,
+        availableSeconds: Math.max(0, quota.availableSeconds - chargeSeconds),
+    };
+}
+
+export function quotaRemainingSeconds(quota: Quota): number {
+    return Math.max(0, Math.floor(quota.availableSeconds));
 }

@@ -1,8 +1,8 @@
 {
     "manifest_version": 2,
     "name": "YT Time Limiter",
-    "version": "3.0",
-    "description": "Limits weekly time spent on YouTube",
+    "version": "3.1",
+    "description": "Adds one hour of YouTube time per day, up to two hours",
     "browser_specific_settings": {
         "gecko": {
             "id": "{8188ed5c-fab3-4f55-a64b-9bf5089f41c5}"
@@ -19,6 +19,10 @@
         "default_title": "YT Time Limiter"
     },
     "permissions": ["storage"],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": true
+    },
     "content_scripts": [
         {
             "matches": ["*://*.youtube.com/*"],

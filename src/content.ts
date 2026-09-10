@@ -1,23 +1,16 @@
-import { TICK_INTERVAL_MS, WEEKLY_LIMIT_SECONDS } from "./lib/constants";
+import { TICK_INTERVAL_MS } from "./lib/constants";
 import { formatSeconds } from "./lib/format";
 import { log } from "./lib/logger";
-import {
-    addToHistory,
-    ensureWeeklyBoundary,
-    getTimeRemainingSeconds,
-    getTimeSpentSeconds,
-    hasReachedWeeklyLimit,
-    incrementTimeSpent,
-    isBeforeMidday,
-    isMiddayRestrictionEnabled,
-} from "./lib/time-limiter";
 
-const MIDDAY_ALERT_MESSAGE = "Videos are disabled before midday (12:00 PM). Please come back later!";
-const WEEKLY_LIMIT_ALERT_MESSAGE = "Weekly YouTube time limit reached!";
+const DAILY_LIMIT_ALERT_MESSAGE = "Your available YouTube time has been used. It refills continuously.";
 const TICK_SECONDS = TICK_INTERVAL_MS / 1000;
 
-let hasShownMiddayAlert = false;
-let hasShownWeeklyLimitAlert = false;
+type UsageSnapshot = {
+    remainingSeconds: number;
+    limitReached: boolean;
+};
+
+let hasShownDailyLimitAlert = false;
 
 function getVideoElement(): HTMLVideoElement | null {
     const videoElement = document.querySelector("video");
@@ -28,22 +21,17 @@ function isVideoPlaying(videoElement: HTMLVideoElement | null): videoElement is 
     return Boolean(videoElement && !videoElement.paused && !videoElement.ended);
 }
 
-function showMiddayAlertOnce(): void {
-    if (hasShownMiddayAlert) {
+function showDailyLimitAlertOnce(): void {
+    if (hasShownDailyLimitAlert) {
         return;
     }
 
-    hasShownMiddayAlert = true;
-    alert(MIDDAY_ALERT_MESSAGE);
+    hasShownDailyLimitAlert = true;
+    alert(DAILY_LIMIT_ALERT_MESSAGE);
 }
 
-function showWeeklyLimitAlertOnce(): void {
-    if (hasShownWeeklyLimitAlert) {
-        return;
-    }
-
-    hasShownWeeklyLimitAlert = true;
-    alert(WEEKLY_LIMIT_ALERT_MESSAGE);
+async function getUsage(): Promise<UsageSnapshot> {
+    return browser.runtime.sendMessage({ type: "yttl:get-usage" }) as Promise<UsageSnapshot>;
 }
 
 async function updateCountdownTimer(): Promise<void> {
@@ -52,30 +40,21 @@ async function updateCountdownTimer(): Promise<void> {
         return;
     }
 
-    const remainingSeconds = await getTimeRemainingSeconds();
+    const { remainingSeconds } = await getUsage();
     logoElement.innerHTML = `<a href="/">${formatSeconds(remainingSeconds)}</a>`;
     logoElement.style.fontWeight = "700";
     logoElement.style.fontSize = "5rem";
 }
 
 async function enforcePlaybackRestrictions(videoElement: HTMLVideoElement): Promise<boolean> {
-    if ((await isMiddayRestrictionEnabled()) && isBeforeMidday()) {
+    if ((await getUsage()).limitReached) {
         videoElement.pause();
-        log("Midday restriction active; pausing video playback.");
-        showMiddayAlertOnce();
+        log("Daily limit already reached; preventing playback.");
+        showDailyLimitAlertOnce();
         return true;
     }
 
-    hasShownMiddayAlert = false;
-
-    if (await hasReachedWeeklyLimit()) {
-        videoElement.pause();
-        log("Weekly limit already reached; preventing playback.");
-        showWeeklyLimitAlertOnce();
-        return true;
-    }
-
-    hasShownWeeklyLimitAlert = false;
+    hasShownDailyLimitAlert = false;
     return false;
 }
 
@@ -85,13 +64,10 @@ async function handleVideoPlay(event: Event): Promise<void> {
         return;
     }
 
-    await ensureWeeklyBoundary();
     await enforcePlaybackRestrictions(target);
 }
 
 async function tick(): Promise<void> {
-    await ensureWeeklyBoundary();
-
     const videoElement = getVideoElement();
     if (!isVideoPlaying(videoElement)) {
         await updateCountdownTimer();
@@ -103,17 +79,18 @@ async function tick(): Promise<void> {
         return;
     }
 
-    const spentSeconds = await incrementTimeSpent(TICK_SECONDS);
-    await addToHistory(TICK_SECONDS);
+    const usage = (await browser.runtime.sendMessage({
+        type: "yttl:consume-playback",
+        seconds: TICK_SECONDS,
+    })) as UsageSnapshot;
 
-    if (spentSeconds >= WEEKLY_LIMIT_SECONDS) {
+    if (usage.limitReached) {
         videoElement.pause();
-        log("Weekly YouTube time limit reached.");
-        showWeeklyLimitAlertOnce();
+        log("Daily YouTube time limit reached.");
+        showDailyLimitAlertOnce();
     } else {
-        hasShownWeeklyLimitAlert = false;
-        const totalSeconds = await getTimeSpentSeconds();
-        log(`Video is playing - total time: ${formatSeconds(totalSeconds)}`);
+        hasShownDailyLimitAlert = false;
+        log(`Video is playing - available time: ${formatSeconds(usage.remainingSeconds)}`);
     }
 
     await updateCountdownTimer();

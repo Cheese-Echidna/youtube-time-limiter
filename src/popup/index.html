@@ -10,31 +10,14 @@
     <body>
         <main class="popup">
             <header class="panel hero">
-                <p class="hero__eyebrow">Weekly Quota</p>
+                <p class="hero__eyebrow">Daily Quota</p>
                 <h1 class="popup__title">YT Time Limiter</h1>
                 <p id="output" class="popup__remaining">--:--:--</p>
-                <p id="status-text" class="popup__status">Time remaining this week</p>
+                <p id="status-text" class="popup__status">Time remaining today</p>
             </header>
 
             <section class="panel panel--actions">
                 <button id="export-csv" class="button button--secondary" type="button">Export history (CSV)</button>
-            </section>
-
-            <section class="panel">
-                <div class="panel__header">
-                    <h2 class="panel__title">Discard Time</h2>
-                    <p id="discard-amount" class="panel__value">0.0 hours selected</p>
-                </div>
-                <input type="range" id="discard-slider" min="0" max="7" step="0.1" value="0" />
-                <button id="discard-btn" class="button button--danger" type="button">Discard Selected Time</button>
-            </section>
-
-            <section class="panel panel--inline">
-                <label class="toggle" for="midday-restriction-toggle">
-                    <input type="checkbox" id="midday-restriction-toggle" />
-                    <span class="toggle__control" aria-hidden="true"></span>
-                    <span class="toggle__label">Block videos before midday (12:00 PM)</span>
-                </label>
             </section>
 
             <section class="panel">

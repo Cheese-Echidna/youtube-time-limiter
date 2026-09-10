@@ -1,14 +1,15 @@
 export const STORAGE_KEYS = {
+    quota: "yttl_quota",
     timeSpentSeconds: "yttl_time_spent",
-    lastResetWeekKey: "yttl_last_reset_day",
     history: "yttl_history",
-    middayRestrictionEnabled: "yttl_midday_restriction_enabled",
 } as const;
 
-export const WEEKLY_LIMIT_HOURS = 7;
-export const WEEKLY_LIMIT_MINUTES = WEEKLY_LIMIT_HOURS * 60;
-export const WEEKLY_LIMIT_SECONDS = WEEKLY_LIMIT_MINUTES * 60;
+export const DAILY_ALLOWANCE_MINUTES = 60;
+export const DAILY_ALLOWANCE_SECONDS = DAILY_ALLOWANCE_MINUTES * 60;
+export const MAX_BALANCE_MINUTES = 120;
+export const MAX_BALANCE_SECONDS = MAX_BALANCE_MINUTES * 60;
+export const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+export const ACCRUED_SECONDS_PER_MILLISECOND = DAILY_ALLOWANCE_SECONDS / MILLISECONDS_PER_DAY;
 
-export const MIDDAY_CUTOFF_HOUR = 12;
 export const TICK_INTERVAL_MS = 1000;
 export const HISTORY_DAYS_VISIBLE = 14;
