@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "YT Time Limiter",
-    "version": "3.1",
+    "version": "3.2",
     "description": "Adds one hour of YouTube time per day, up to two hours",
     "browser_specific_settings": {
         "gecko": {
