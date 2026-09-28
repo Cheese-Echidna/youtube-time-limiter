@@ -16,6 +16,43 @@
                 <p id="status-text" class="popup__status">Time remaining today</p>
             </header>
 
+            <section class="panel saved-section" aria-labelledby="saved-title">
+                <div class="panel__header">
+                    <h2 id="saved-title" class="panel__title">Saved videos</h2>
+                    <span id="saved-count" class="muted"></span>
+                </div>
+                <div class="saved-controls">
+                    <button id="fits-toggle" class="button button--filter" type="button" aria-pressed="false">
+                        Show videos that fit
+                    </button>
+                    <label class="speed-label" for="planning-speed"
+                        >At
+                        <input
+                            id="planning-speed"
+                            type="number"
+                            min="0.25"
+                            max="16"
+                            step="0.05"
+                            value="1"
+                            aria-label="Estimated playback speed"
+                        />×
+                    </label>
+                </div>
+                <p class="muted">Fit estimates assume one video is playing.</p>
+                <p id="saved-empty" class="muted" hidden></p>
+                <ul id="saved-list" class="saved-list"></ul>
+            </section>
+
+            <section class="panel panel--setting">
+                <label class="setting" for="audio-only">
+                    <input id="audio-only" type="checkbox" />
+                    <span>
+                        <strong>Audio-only playback</strong>
+                        <span class="setting__description">Hide video and use 1 second of quota every 2 seconds.</span>
+                    </span>
+                </label>
+            </section>
+
             <section class="panel panel--actions">
                 <button id="export-csv" class="button button--secondary" type="button">Export history (CSV)</button>
             </section>
@@ -25,7 +62,7 @@
                     <h2 class="panel__title">Usage Trend</h2>
                     <p class="muted">Last 14 days</p>
                 </div>
-                <canvas id="history-chart" width="312" height="126"></canvas>
+                <canvas id="history-chart" width="404" height="126"></canvas>
             </section>
         </main>
     </body>

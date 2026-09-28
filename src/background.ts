@@ -1,11 +1,5 @@
-import {
-    addToHistory,
-    getHistory,
-    consumeQuota,
-    getQuota,
-    quotaRemainingSeconds,
-    saveQuota,
-} from "./lib/time-limiter";
+import { addToHistory, getHistory, consumeQuota, getQuota, quotaRemainingSeconds, saveQuota } from "./lib/time-limiter";
+import { getSavedVideos, removeVideo, saveVideo, videoIdFromUrl } from "./lib/saved-videos";
 
 type UsageSnapshot = {
     remainingSeconds: number;
@@ -70,6 +64,26 @@ browser.runtime.onMessage.addListener((message: unknown, sender): Promise<unknow
 
     if (type === "yttl:get-history") {
         return getHistory();
+    }
+
+    if (type === "yttl:get-saved") return queueOperation(getSavedVideos);
+    if (type === "yttl:save-video") return queueOperation(() => saveVideo((message as { video?: unknown }).video));
+    if (type === "yttl:remove-video") return queueOperation(() => removeVideo((message as { id?: unknown }).id));
+    if (type === "yttl:update-saved-playback") {
+        return queueOperation(async () => {
+            const details = (message as { video?: unknown }).video;
+            if (!details || typeof details !== "object") return;
+            const data = details as Record<string, unknown>;
+            const id = typeof data.url === "string" ? videoIdFromUrl(data.url) : null;
+            if (!id) return;
+            const saved = (await getSavedVideos()).find((video) => video.id === id);
+            if (!saved || (data.positionOnStop !== true && saved.durationSeconds !== null)) return;
+            await saveVideo({
+                ...data,
+                rating: saved.rating,
+                positionSeconds: data.positionOnStop === true ? data.positionSeconds : saved.positionSeconds,
+            });
+        });
     }
 
     return undefined;

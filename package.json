@@ -1,6 +1,6 @@
 {
     "name": "yt-time-limiter",
-    "version": "3.2",
+    "version": "3.5.1",
     "private": true,
     "type": "module",
     "scripts": {
@@ -11,7 +11,8 @@
         "format": "prettier --write \"**/*.{ts,js,mjs,json,css,html,md}\"",
         "typecheck": "tsc --noEmit --project src/tsconfig.json",
         "build:source": "node scripts/build.mjs",
-        "build:watch": "node scripts/build.mjs --watch"
+        "build:watch": "node scripts/build.mjs --watch",
+        "set-version": "node scripts/set-version.mjs"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.1",

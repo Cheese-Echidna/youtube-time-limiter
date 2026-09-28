@@ -13,6 +13,7 @@ const watchMode = process.argv.includes("--watch");
 const staticFiles = [
     { relativePath: "manifest.json" },
     { relativePath: "icon.png" },
+    { relativePath: "content.css" },
     { relativePath: "popup/index.html" },
     { relativePath: "popup/styles.css" },
     { relativePath: ".amo-upload-uuid", optional: true },

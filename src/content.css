@@ -1,0 +1,138 @@
+ytd-rich-item-renderer,
+ytd-rich-grid-media,
+yt-lockup-view-model,
+ytd-browse[page-subtype="home"] ytd-video-renderer,
+ytd-browse[page-subtype="home"] ytd-grid-video-renderer,
+ytd-notification-renderer {
+    position: relative;
+}
+.yttl-card-save,
+.yttl-watch-save {
+    border: 1px solid #d0d7d7;
+    border-radius: 20px;
+    padding: 7px 12px;
+    background: #f8faf9;
+    color: #173b38;
+    font:
+        600 12px system-ui,
+        sans-serif;
+    cursor: pointer;
+    z-index: 2147483646;
+}
+.yttl-card-save {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+}
+.yttl-watch-action {
+    position: relative;
+    inset: auto;
+    margin: 0 8px;
+    white-space: nowrap;
+}
+ytd-watch-metadata #actions-inner,
+ytd-watch-metadata #actions {
+    position: relative;
+}
+.yttl-card-save:hover,
+.yttl-watch-save:hover {
+    background: #dcefeb;
+}
+.yttl-picker {
+    position: fixed;
+    z-index: 2147483647;
+    width: min(280px, calc(100vw - 16px));
+    padding: 14px;
+    background: #f8faf9;
+    color: #172b29;
+    border: 1px solid #bed0cb;
+    border-radius: 12px;
+    box-shadow: 0 12px 36px #101c1b55;
+    font:
+        13px system-ui,
+        sans-serif;
+    line-height: 1.4;
+}
+.yttl-picker__choices {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin: 10px 0;
+}
+.yttl-picker__choices button {
+    min-height: 34px;
+    border: 1px solid #b8c9c5;
+    border-radius: 7px;
+    background: #e7f2ef;
+    color: #173b38;
+    cursor: pointer;
+}
+.yttl-picker__choices button:hover,
+.yttl-picker__choices button:focus-visible {
+    background: #bcded4;
+}
+.yttl-picker__close {
+    border: 0;
+    background: none;
+    color: #385d57;
+    cursor: pointer;
+    padding: 4px;
+}
+.yttl-player-notice {
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    z-index: 60;
+    max-width: min(340px, 65%);
+    border-radius: 10px;
+    padding: 8px 11px;
+    background: #16231fd9;
+    color: #f4f8f6;
+    font:
+        500 13px/1.4 system-ui,
+        sans-serif;
+    pointer-events: auto;
+}
+.yttl-player-notice[hidden],
+.yttl-finish[hidden],
+.yttl-countdown[hidden],
+.yttl-watch-save[hidden] {
+    display: none;
+}
+.yttl-countdown {
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+}
+.yttl-countdown--soon {
+    color: #f7d297;
+}
+.yttl-watch-save {
+    margin-top: 8px;
+}
+html.yttl-home-rest ytd-browse[page-subtype="home"] ytd-rich-grid-renderer {
+    display: none !important;
+}
+.yttl-home-banner {
+    max-width: 660px;
+    margin: 48px auto;
+    padding: 26px;
+    border-radius: 16px;
+    background: #e9f2ee;
+    color: #173b38;
+    font:
+        16px/1.5 system-ui,
+        sans-serif;
+}
+.yttl-home-banner h2 {
+    margin: 0 0 12px;
+    font-size: 24px;
+}
+.yttl-home-banner p {
+    margin: 8px 0;
+}
+.yttl-card-save:focus-visible,
+.yttl-watch-save:focus-visible,
+.yttl-picker button:focus-visible {
+    outline: 2px solid #0d7462;
+    outline-offset: 2px;
+}

@@ -26,7 +26,7 @@ function sanitizeHistory(rawValue: unknown): UsageHistory {
             continue;
         }
 
-        history[dateKey] = Math.round(seconds);
+        history[dateKey] = seconds;
     }
 
     return history;
@@ -42,7 +42,7 @@ async function setHistory(history: UsageHistory): Promise<void> {
 }
 
 export async function addToHistory(seconds: number): Promise<void> {
-    const normalizedSeconds = Math.max(0, Math.round(seconds));
+    const normalizedSeconds = Math.max(0, seconds);
     if (normalizedSeconds === 0) {
         return;
     }

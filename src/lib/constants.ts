@@ -2,6 +2,9 @@ export const STORAGE_KEYS = {
     quota: "yttl_quota",
     timeSpentSeconds: "yttl_time_spent",
     history: "yttl_history",
+    audioOnlyMode: "yttl_audio_only_mode",
+    savedVideos: "yttl_saved_videos",
+    playbackRate: "yttl_playback_rate",
 } as const;
 
 export const DAILY_ALLOWANCE_MINUTES = 60;
